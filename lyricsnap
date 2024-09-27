@@ -1,0 +1,148 @@
+#! /usr/bin/python3
+
+
+import requests
+import os, sys
+from bs4 import BeautifulSoup as bs
+
+from rich.console import Console
+from rich.text import Text
+from rich.panel import Panel
+
+
+GOOGLE_SEARCH = "https://www.google.com/search?q=letras+"
+URL_LETRAS = "https://www.letras.mus.br/"
+GOOGLE_RESULTS_PATTERN = ".Gx5Zad a"
+
+
+def showBanner(title, content):
+
+    console = Console()
+    bannerText = Text(content, style="bold cyan")
+
+    bannerPanel = Panel(
+        bannerText,
+        title=title,
+        subtitle="",
+        border_style="green",
+        padding=(1, 5),
+    )
+
+    console.print(bannerPanel)
+
+
+def getWebPage(url):
+    page = requests.get(url)
+    page.raise_for_status()
+    return page.text
+
+
+def googleSearch(keywords):
+
+    global GOOGLE_SEARCH, GOOGLE_RESULTS_PATTERN, URL_LETRAS
+    keywords = keywords.strip().replace(" ", "+")
+    url = GOOGLE_SEARCH + keywords
+    webpage = getWebPage(url)
+    soup = bs(webpage, "html.parser")
+    results = soup.select(GOOGLE_RESULTS_PATTERN)
+    results = findLetrasURL(URL_LETRAS, results)
+    return results[0] if results else None
+
+
+def findLetrasURL(baseURL, soup):
+
+    matches = []
+    for link in soup:
+        href = link["href"]
+        if href.startswith("/url?q="):
+            href = href[7:]
+        if href.startswith(baseURL):
+            href = href[: href.rfind("/")]
+            matches.append(href)
+
+    return matches
+
+
+def findLyrics(url):
+
+    webpage = getWebPage(url)
+    soup = bs(webpage, "html.parser")
+    title, artist = getMusicData(soup)
+    lyrics = soup.select(".lyric-original p")
+    lyrics = formatLyrics(str(lyrics)[1:-1])
+
+    soup = bs(getWebPage(url + "/traducao.html"), "html.parser")
+    traduction = soup.select(".lyric-translation span span:nth-child(1)")
+
+    traduction = formatLyrics(str(traduction)[1:-1])
+
+    data = {"title": title, "artist": artist, "lyric": lyrics, "traduction": traduction}
+
+    return data
+
+
+def getMusicData(page):
+    title = page.select_one("h1[class=textStyle-primary]")
+    artist = page.select_one("h2[class=textStyle-secondary]")
+    return title.text.strip(), artist.text.strip()
+
+
+def formatLyrics(lyric):
+    lyric = lyric.strip()
+    lyric = lyric.replace("<br/>", "\n").replace("<p>", "")
+    lyric = lyric.replace("<span>", "")
+    lyric = lyric.replace("</span>", "\n\n")
+    lyric = lyric.replace("</p>", "\n\n")
+    lyric = lyric.replace("\n\n, ", "\n\n")
+
+    return lyric
+
+
+def main(mode):
+    os.system("clear")
+    showBanner("LyricSnap", "🎶Welcome to LyricSnap🎶\nBy: Marcos Arlove")
+    title = input("Enter the song title: ")
+    artist = input("Enter the singer's name: ")
+    keywords = f"{artist} {title}"
+    try:
+        link = googleSearch(keywords)
+    except:
+        print("Some error occurred...")
+        print("Make sure you are connected to the internet")
+        os.abort()
+    try:
+        data = findLyrics(link)
+    except:
+        print("The search did not generate any results")
+        print("make sure you write the artist name and song title")
+        os.abort()
+    title = f"{data['title']} {data['artist']}"
+    if not data["traduction"]:
+        data["traduction"] = "No translation available"
+
+    if mode:
+        showBanner(title, data["lyric"])
+        showBanner("Traduction", data["traduction"])
+    else:
+        saveFile(path, data["lyric"], data["traduction"])
+        print("Done!")
+        print(f"Lyrics saved in {path}")
+
+
+def saveFile(path, lyric, traduction):
+
+    os.makedirs("lyrics", exist_ok=True)
+    with open(path, "w") as fp:
+        fp.write(lyric)
+        fp.writelines("\n\n\nTraduction\n\n\n")
+        fp.write(traduction)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        main(True)
+    elif sys.argv[1] == "-f":
+        main(False)
+    else:
+        print(f"The parameter {sys.argv[1]} is not valid")
+        os.abort()
