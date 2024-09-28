@@ -21,7 +21,7 @@ LyricSnap was developed to run on Python 3 and depends on the following librarie
 
 Run the following command to install the required dependencies:
 
-```bash
+
 pip install requests beautifulsoup4 rich
 
 How to Use
