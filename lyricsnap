@@ -12,6 +12,7 @@ from rich.panel import Panel
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=letras+"
 URL_LETRAS = "https://www.letras.mus.br/"
+URL_LETRAS = "https://www.letras.com/"
 GOOGLE_RESULTS_PATTERN = ".Gx5Zad a"
 
 
@@ -39,14 +40,16 @@ def getWebPage(url):
 
 def googleSearch(keywords):
 
-    global GOOGLE_SEARCH, GOOGLE_RESULTS_PATTERN, URL_LETRAS
+    global GOOGLE_SEARCH, GOOGLE_RESULTS_PATTERN, URL_LETRAS, URL_LETRAS_FIRST
     keywords = keywords.strip().replace(" ", "+")
     url = GOOGLE_SEARCH + keywords
     webpage = getWebPage(url)
     soup = bs(webpage, "html.parser")
-    results = soup.select(GOOGLE_RESULTS_PATTERN)
-    results = findLetrasURL(URL_LETRAS, results)
-    return results[0] if results else None
+    GResults = soup.select(GOOGLE_RESULTS_PATTERN)
+    LResults = findLetrasURL(URL_LETRAS, GResults)
+    if not LResults:
+        LResults = findLetrasURL(URL_LETRAS_FIRST, GResults)
+    return LResults[0] if LResults else None
 
 
 def findLetrasURL(baseURL, soup):
@@ -114,7 +117,7 @@ def main(mode):
         data = findLyrics(link)
     except:
         print("The search did not generate any results")
-        print("make sure you write the artist name and song title")
+        print("Make sure you write the artist name and song title")
         os.abort()
     title = f"{data['title']} {data['artist']}"
     if not data["traduction"]:
