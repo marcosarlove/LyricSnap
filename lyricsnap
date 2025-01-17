@@ -12,7 +12,7 @@ from rich.panel import Panel
 
 GOOGLE_SEARCH = "https://www.google.com/search?q=letras+"
 URL_LETRAS = "https://www.letras.mus.br/"
-URL_LETRAS = "https://www.letras.com/"
+URL_LETRAS_FIRST = "https://www.letras.com/"
 GOOGLE_RESULTS_PATTERN = ".Gx5Zad a"
 
 
@@ -40,7 +40,7 @@ def getWebPage(url):
 
 def googleSearch(keywords):
 
-    global GOOGLE_SEARCH, GOOGLE_RESULTS_PATTERN, URL_LETRAS, URL_LETRAS_FIRST
+    global GOOGLE_SEARCH, GOOGLE_RESULTS_PATTERN, URL_LETRAS
     keywords = keywords.strip().replace(" ", "+")
     url = GOOGLE_SEARCH + keywords
     webpage = getWebPage(url)
@@ -127,6 +127,7 @@ def main(mode):
         showBanner(title, data["lyric"])
         showBanner("Traduction", data["traduction"])
     else:
+        path = f"./lyrics/{title}"
         saveFile(path, data["lyric"], data["traduction"])
         print("Done!")
         print(f"Lyrics saved in {path}")
@@ -135,7 +136,7 @@ def main(mode):
 def saveFile(path, lyric, traduction):
 
     os.makedirs("lyrics", exist_ok=True)
-    with open(path, "w") as fp:
+    with open(path.replace(' ', '_'), "w") as fp:
         fp.write(lyric)
         fp.writelines("\n\n\nTraduction\n\n\n")
         fp.write(traduction)
