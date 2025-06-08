@@ -1,9 +1,4 @@
-
-```markdown
 # 🎵 LyricSnap - Song Lyrics Finder
-
-![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)
-![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 LyricSnap is a command-line tool that searches for song lyrics and translations from Letras.mus.br, displaying them in a beautifully formatted way or saving to a file.
 
@@ -42,10 +37,6 @@ chmod +x lyricsnap.py
 ```bash
 ./lyricsnap.py -f
 ```
-
-## 📷 Screenshot
-
-![LyricSnap in action](https://i.imgur.com/EXAMPLE.png) *(example screenshot)*
 
 ## 🛠️ Code Structure
 
@@ -91,12 +82,7 @@ Project Link: [https://github.com/marcosarlove/lyricsnap](https://github.com/mar
 
 
 
-
-```markdown
 # 🎵 LyricSnap - Buscador de Letras de Música
-
-![Versão Python](https://img.shields.io/badge/python-3.8+-blue.svg)
-![Licença](https://img.shields.io/badge/license-MIT-green.svg)
 
 O LyricSnap é uma ferramenta de linha de comando que busca letras de música e traduções no Letras.mus.br, exibindo-as de forma bonita no terminal ou salvando em arquivo.
 
@@ -135,10 +121,6 @@ chmod +x lyricsnap.py
 ```bash
 ./lyricsnap.py -f
 ```
-
-## 📷 Captura de Tela
-
-![LyricSnap em ação](https://i.imgur.com/EXAMPLE.png) *(exemplo de screenshot)*
 
 ## 🛠️ Estrutura do Código
 
